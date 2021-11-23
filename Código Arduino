@@ -12,7 +12,7 @@ const int RightMotorBackward = 3;
 #define trig_pin A1 
 #define echo_pin A2 
 
-#define maximum_distance 200
+#define maximum_distance 200 //distância máxima em cm lida pelo sensor. O carro ignorará objetos mais longe do que 200 cm.
 boolean goesForward = false;
 int distance = 100;
 
