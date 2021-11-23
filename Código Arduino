@@ -1,22 +1,22 @@
 
-#include <Servo.h>          //standard library for the servo
-#include <NewPing.h>        //for the Ultrasonic sensor function library.
+#include <Servo.h>          //Biblioteca padrão do motor servo
+#include <NewPing.h>        //Biblioteca utilizada pelo sensor HC-SR04
 
-//L298N motor control pins
+//Pins que controlam o driver L298n. Os pins foram trocados em relação ao projeto original para fazer uso da função digital PWM
 const int LeftMotorForward = 6;
 const int LeftMotorBackward = 11;
 const int RightMotorForward = 5;
 const int RightMotorBackward = 3;
 
-//sensor pins
-#define trig_pin A1 //analog input 1
-#define echo_pin A2 //analog input 2
+//Pins que controlam o sensor HC-SR04
+#define trig_pin A1 
+#define echo_pin A2 
 
 #define maximum_distance 200
 boolean goesForward = false;
 int distance = 100;
 
-NewPing sonar(trig_pin, echo_pin, maximum_distance); //sensor function
+NewPing sonar(trig_pin, echo_pin, maximum_distance); //funcionamento do sensor
 Servo servo_motor; 
 
 void setup(){
@@ -26,11 +26,11 @@ void setup(){
   pinMode(LeftMotorBackward, OUTPUT);
   pinMode(RightMotorBackward, OUTPUT);
   
-  servo_motor.attach(9); //our servo pin
+  servo_motor.attach(9); //Pin que controla o motor servo
 
   servo_motor.write(115);
   delay(2000);
-  distance = readPing();
+  distance = readPing(); //delay de disparos contínuos da onda sonora
   delay(100);
   distance = readPing();
   delay(100);
@@ -46,6 +46,7 @@ void loop(){
   int distanceLeft = 0;
   delay(50);
 
+//se a distância for menos do que 20 cm, o carro parará e chamará as funções necessárias para dar ré, olhar para os lados e procurar pela melhor opção
   if (distance <= 20){
     moveStop();
     delay(300);
@@ -73,6 +74,8 @@ void loop(){
     distance = readPing();
 }
 
+//abaixo, funções que fazem o carro "olhar" para os lados, chamando a função read ping que fará a leitura da distância de cada lado
+
 int lookRight(){  
   servo_motor.write(50);
   delay(500);
@@ -94,12 +97,15 @@ int lookLeft(){
 
 int readPing(){
   delay(70);
-  int cm = sonar.ping_cm();
+  int cm = sonar.ping_cm(); //função do da biblioteca newping que traz a distância em centímetros
   if (cm==0){
     cm=250;
   }
   return cm;
 }
+
+//funções de movimento do carro abaixo. Para controlar a velocidade do motor e evitar que ele funcione sempre em força total, 
+//foram utilizados comandos analogwrite(Digital PWM) declarando entre 0 e 255 o quanto de força deveria ser utilizada. 
 
 void moveStop(){
   
@@ -151,8 +157,6 @@ void turnRight(){
   digitalWrite(LeftMotorBackward, LOW);
   digitalWrite(RightMotorBackward, LOW);
  
-  
-  
 }
 
 void turnLeft(){
